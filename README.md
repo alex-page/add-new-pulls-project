@@ -1,17 +1,17 @@
-# Add new issues to project
+# Add new pull requests to project
 
-> ✨ GitHub action to automagically add new issues to projects.
+> ✨ GitHub action to automagically add new pull requests to projects.
 
 
 # How to use
 
-To use this action we need the project number and the name of the column for the new issues to go into. Get your project number from the URL `https://github.com/alex-page/test-actions/projects/1` the project number would be `1`.
+To use this action we need the project number and the name of the column for the new pull requests to go into. Get your project number from the URL `https://github.com/alex-page/test-actions/projects/1` the project number would be `1`.
 
 In your project create a new workflow file `.github/main.workflow`:
 ```
-workflow "✨Add new issues to projects" {
+workflow "✨Add new pull requests to projects" {
   resolves = ["alex-page/add-new-issue-project"]
-  on = "issues"
+  on = "pull_requests"
 }
 
 action "alex-page/add-new-issue-project" {

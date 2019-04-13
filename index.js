@@ -8,6 +8,7 @@ Toolkit.run( async ( tools ) => {
     const columnName    = tools.arguments._[ 1 ];
 
     // Get the data from the event
+    tools.log( tools.context.payload );
     const issueUrl   = tools.context.payload.issue.html_url;
     const issueTitle = tools.context.payload.issue.title;
 
@@ -87,6 +88,6 @@ Toolkit.run( async ( tools ) => {
     tools.exit.failure( error );
   }
 }, {
-  event: [ 'issues.opened', 'pull_request.opened' ],
+  event: [ 'pull_request.opened' ],
   secrets: [ 'GITHUB_TOKEN' ],
 })
