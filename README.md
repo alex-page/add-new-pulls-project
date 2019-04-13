@@ -5,7 +5,9 @@
 
 # How to use
 
-To use this action we need the project number and the name of the column for the new pull requests to go into. Get your project number from the URL `/projects/1` the project number would be `1`.
+To use this action we need the project number and the name of the column for the new pull requests to go into. 
+- Get the project number from the project URL `projects/1` the number would be `1`.
+- Get the column name from the project board for example "To do".
 
 In your project create a new workflow file `.github/main.workflow`:
 ```
