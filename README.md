@@ -10,12 +10,12 @@ To use this action we need the project number and the name of the column for the
 In your project create a new workflow file `.github/main.workflow`:
 ```
 workflow "✨Add new pull requests to projects" {
-  resolves = ["alex-page/add-new-issue-project"]
+  resolves = ["alex-page/add-new-pulls-project"]
   on = "pull_requests"
 }
 
-action "alex-page/add-new-issue-project" {
-  uses = "alex-page/add-new-issue-project@master"
+action "alex-page/add-new-pulls-project" {
+  uses = "alex-page/add-new-pulls-project@master"
   args = [ "1", "To do"]
   secrets = ["GITHUB_TOKEN"]
 }

@@ -1,26 +1,26 @@
 {
-  "name": "add-new-issue-project",
+  "name": "add-new-pull-request-project",
   "version": "0.0.1",
-  "description": "GitHub action to automagically add new issues to projects.",
+  "description": "GitHub action to automagically add new pull requests to projects.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alex-page/add-new-issue-project.git"
+    "url": "git+https://github.com/alex-page/add-new-pull-request-project.git"
   },
   "keywords": [
     "github-actions",
     "github-projects",
-    "issues"
+    "pull-requests"
   ],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/alex-page/add-new-issue-project/issues"
+    "url": "https://github.com/alex-page/add-new-pull-request-project/pull-requests"
   },
-  "homepage": "https://github.com/alex-page/add-new-issue-project#readme",
+  "homepage": "https://github.com/alex-page/add-new-pull-request-project#readme",
   "dependencies": {
     "actions-toolkit": "^2.0.0"
   }
