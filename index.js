@@ -10,13 +10,12 @@ Toolkit.run( async ( tools ) => {
     // Get the data from the event
     const pullrequestUrl   = tools.context.payload.pull_request.html_url;
     const pullrequestTitle = tools.context.payload.pull_request.title;
+    const pullrequestId    = tools.context.payload.pull_request.node_id;
 
-
-    // Get the issue id, project name and number, column ID and name
+    // Get the project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
       resource( url: "${ pullrequestUrl }" ) {
-        ... on Issue {
-          id
+        ... on PullRequest {
           repository {
             projects( first: 10, states: [OPEN] ) {
               nodes {
@@ -52,9 +51,6 @@ Toolkit.run( async ( tools ) => {
       }
     }`);
 
-    // Get the issue ID
-    const pullrequestId = resource.id;
-
     // Get the project from the matching provided number
     const project = resource.repository.projects.nodes
       .filter( node => node.number === projectNumber )[ 0 ];
@@ -81,7 +77,7 @@ Toolkit.run( async ( tools ) => {
 
     // Log success message
     tools.log.success(
-      `Added issue "${ pullrequestTitle }" to "${ project.name }" in "${ column.name }".`
+      `Added pull request "${ pullrequestTitle }" to "${ project.name }" in "${ column.name }".`
     );
   }
   catch( error ){
