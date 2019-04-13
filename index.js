@@ -8,13 +8,13 @@ Toolkit.run( async ( tools ) => {
     const columnName    = tools.arguments._[ 1 ];
 
     // Get the data from the event
-    tools.log( tools.context.payload );
-    const issueUrl   = tools.context.payload.issue.html_url;
-    const issueTitle = tools.context.payload.issue.title;
+    const pullrequestUrl   = tools.context.payload.pull_request.html_url;
+    const pullrequestTitle = tools.context.payload.pull_request.title;
+
 
     // Get the issue id, project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
-      resource( url: "${ issueUrl }" ) {
+      resource( url: "${ pullrequestUrl }" ) {
         ... on Issue {
           id
           repository {
@@ -53,7 +53,7 @@ Toolkit.run( async ( tools ) => {
     }`);
 
     // Get the issue ID
-    const issueId = resource.id;
+    const pullrequestId = resource.id;
 
     // Get the project from the matching provided number
     const project = resource.repository.projects.nodes
@@ -73,7 +73,7 @@ Toolkit.run( async ( tools ) => {
     // Add the card to the project
     await tools.github.graphql(
       `mutation {
-        addProjectCard( input: { contentId: "${ issueId }", projectColumnId: "${ columnId }" }) {
+        addProjectCard( input: { contentId: "${ pullrequestId }", projectColumnId: "${ columnId }" }) {
           clientMutationId
         }
       }`
@@ -81,7 +81,7 @@ Toolkit.run( async ( tools ) => {
 
     // Log success message
     tools.log.success(
-      `Added issue "${ issueTitle }" to "${ project.name }" in "${ column.name }".`
+      `Added issue "${ pullrequestTitle }" to "${ project.name }" in "${ column.name }".`
     );
   }
   catch( error ){
