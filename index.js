@@ -4,24 +4,20 @@ const { Toolkit } = require( 'actions-toolkit' );
 Toolkit.run( async ( tools ) => {
   try {
     // Get the arguments
-    const projectNumber = tools.arguments._[ 0 ];
-    const columnName    = tools.arguments._[ 1 ];
+    const projectName = tools.arguments._[ 0 ];
+    const columnName  = tools.arguments._[ 1 ];
 
     // Get the data from the event
-    const pullrequestUrl   = tools.context.payload.pull_request.html_url;
-    const pullrequestTitle = tools.context.payload.pull_request.title;
-    const pullrequestId    = tools.context.payload.pull_request.node_id;
+    const pullrequest = tools.context.payload.pull_request;
 
     // Get the project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
-      resource( url: "${ pullrequestUrl }" ) {
-        ... on PullRequest {
+      resource( url: "${ pullrequest.html_url }" ) {
+        ... on Pull Request {
           repository {
-            projects( first: 10, states: [OPEN] ) {
+            projects( search: "${ projectName }", first: 10, states: [OPEN] ) {
               nodes {
-                name
-                number
-                columns( first: 10 ) {
+                columns( first: 100 ) {
                   nodes {
                     id
                     name
@@ -30,13 +26,10 @@ Toolkit.run( async ( tools ) => {
               }
             }
             owner {
-              url
               ... on Organization {
-                projects( first: 10, states: [OPEN] ) {
+                projects( search: "${ projectName }", first: 10, states: [OPEN] ) {
                   nodes {
-                    name
-                    number
-                    columns( first: 10 ) {
+                    columns( first: 100 ) {
                       nodes {
                         id
                         name
@@ -51,33 +44,51 @@ Toolkit.run( async ( tools ) => {
       }
     }`);
 
-    // Get the project from the matching provided number
-    const project = resource.repository.projects.nodes
-      .filter( node => node.number === projectNumber )[ 0 ];
-
-    // Get the column from the matching provided column name
-    const column = project.columns.nodes.filter( node => node.name === columnName )[ 0 ];
-    const columnId = column.id;
+    // Get an array of all matching projects
+    const repoProjects = resource.repository.projects.nodes || [];
+    const orgProjects = resource.repository.owner
+      && resource.repository.owner.projects
+      && resource.repository.owner.projects.nodes
+      || [];
+    
+    // Get the columns with matching names
+    const columns = [ ...repoProjects, ...orgProjects ]
+      .flatMap( projects => {
+        return projects.columns.nodes
+          ? projects.columns.nodes.filter( column => column.name === columnName )
+          : [];
+      });
 
     // Check we have a valid column ID
-    if( !columnId || !project ) {
-      tools.exit.failure(
-        `Could not find project number "${ projectNumber }" or column "${ columnName }"`
-      );
+    if( !columns.length ) {
+      tools.exit.failure( `Could not find "${ projectName }" with "${ columnName }" column` );
     }
 
-    // Add the card to the project
-    await tools.github.graphql(
-      `mutation {
-        addProjectCard( input: { contentId: "${ pullrequestId }", projectColumnId: "${ columnId }" }) {
-          clientMutationId
+    
+    // Add the cards to the columns
+    const createCards = columns.map( column => {
+      return new Promise( async( resolve, reject ) => {
+        try {
+          await tools.github.graphql(`mutation {
+            addProjectCard( input: { contentId: "${ pullrequest.node_id }", projectColumnId: "${ column.id }" }) {
+              clientMutationId
+            }
+          }`);
+
+          resolve();
         }
-      }`
-    );
+        catch( error ){
+          reject( error );
+        }
+      })
+    })
+
+    // Wait for completion
+    await Promise.all( createCards ).catch( error => tools.exit.failure( error ) );
 
     // Log success message
     tools.log.success(
-      `Added pull request "${ pullrequestTitle }" to "${ project.name }" in "${ column.name }".`
+      `Added pull request ${ pullrequest.title } to ${ projectName } in ${ columnName }.`
     );
   }
   catch( error ){
