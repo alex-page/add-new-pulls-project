@@ -13,7 +13,7 @@ Toolkit.run( async ( tools ) => {
     // Get the project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
       resource( url: "${ pullrequest.html_url }" ) {
-        ... on Pull Request {
+        ... on PullRequest {
           repository {
             projects( search: "${ projectName }", first: 10, states: [OPEN] ) {
               nodes {
