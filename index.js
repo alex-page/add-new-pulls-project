@@ -10,6 +10,8 @@ Toolkit.run( async ( tools ) => {
     // Get the data from the event
     const pullrequest = tools.context.payload.pull_request;
 
+    tools.log( tools.context.payload );
+
     // Get the project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
       resource( url: "${ pullrequest.html_url }" ) {
@@ -95,6 +97,6 @@ Toolkit.run( async ( tools ) => {
     tools.exit.failure( error );
   }
 }, {
-  event: [ 'pull_request.opened' ],
+  event: [ 'pull_request.opened', 'check_run' ],
   secrets: [ 'GITHUB_TOKEN' ],
 })
