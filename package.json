@@ -1,6 +1,6 @@
 {
   "name": "add-new-pulls-project",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "GitHub action to automagically add new pull requests to projects.",
   "main": "index.js",
   "scripts": {

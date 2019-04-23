@@ -7,12 +7,14 @@ Toolkit.run( async ( tools ) => {
     const projectName = tools.arguments._[ 0 ];
     const columnName  = tools.arguments._[ 1 ];
 
-    // Get the data from the event
-    const pullrequest = tools.context.payload.pull_request;
+    const { action, pull_request } = tools.context.payload;
+    if( action !== 'opened' ){
+      tools.exit.neutral( `Event ${ action } is not supported by this action.` )
+    }
 
     // Get the project name and number, column ID and name
     const { resource } = await tools.github.graphql(`query {
-      resource( url: "${ pullrequest.html_url }" ) {
+      resource( url: "${ pull_request.html_url }" ) {
         ... on PullRequest {
           repository {
             projects( search: "${ projectName }", first: 10, states: [OPEN] ) {
@@ -70,7 +72,7 @@ Toolkit.run( async ( tools ) => {
       return new Promise( async( resolve, reject ) => {
         try {
           await tools.github.graphql(`mutation {
-            addProjectCard( input: { contentId: "${ pullrequest.node_id }", projectColumnId: "${ column.id }" }) {
+            addProjectCard( input: { contentId: "${ pull_request.node_id }", projectColumnId: "${ column.id }" }) {
               clientMutationId
             }
           }`);
@@ -88,13 +90,13 @@ Toolkit.run( async ( tools ) => {
 
     // Log success message
     tools.log.success(
-      `Added pull request ${ pullrequest.title } to ${ projectName } in ${ columnName }.`
+      `Added pull request ${ pull_request.title } to ${ projectName } in ${ columnName }.`
     );
   }
   catch( error ){
     tools.exit.failure( error );
   }
 }, {
-  event: [ 'pull_request.opened' ],
+  event: [ 'pull_request' ],
   secrets: [ 'GITHUB_TOKEN' ],
 })
