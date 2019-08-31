@@ -36,7 +36,7 @@ In your project create a new workflow file `.github/main.workflow`:
 ```
 workflow "✨Add new pull requests to projects" {
   resolves = ["alex-page/add-new-pulls-project"]
-  on = "pull_requests"
+  on = "pull_request"
 }
 
 action "alex-page/add-new-pulls-project" {
@@ -64,7 +64,8 @@ secrets = ["GH_PAT"]
 
 ## Release history
 
-- v0.0.4 - Deprecated
+- v0.0.5 - Deprecated
+- v0.0.4 - Fix incorrect documentation
 - v0.0.3 - Add optional personal access token for private repos
 - v0.0.2 - End in a neutral state for unsupported pull request action
 - v0.0.1 - First release
